@@ -110,59 +110,59 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 100vh; /* Reduce the minimum height for better mobile viewing */
-        padding: 10px; /* Add some padding for spacing */
+        min-height: 100vh;
+        padding: 10px;
     }
 
     .sudoku-board {
         display: grid;
-        grid-template-columns: repeat(9, minmax(30px, 1fr)); /* Adjust column width for mobile */
-        gap: 5px; /* Adjust gap between cells */
-        max-width: 90vw; /* Adjust maximum width of the board */
+        grid-template-columns: repeat(9, minmax(30px, 1fr));
+        gap: 5px;
+        max-width: 90vw;
     }
 
     .sudoku-cell {
-        width: 30px; /* Adjust cell width */
-        height: 30px; /* Adjust cell height */
-        font-size: 1rem; /* Adjust font size for mobile */
-        border: 1px solid #ccc; /* Reduce the border width for mobile */
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
     }
 
     .sudoku-cell.invalid {
-        background-color: #000; /* Keep the background color */
+        background-color: #000;/
     }
 
     .possibilities {
         position: absolute;
-        top: 2px; /* Adjust top position for mobile */
-        left: 4px; /* Adjust left position for mobile */
-        font-size: 6px;
+        top: 3px;
+        left: 5px;
+        font-size: 8px;
         color: #fff;
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* Simplify grid columns */
-        gap: 1px; /* Reduce gap between possibilities */
-        opacity: 0.55;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3px;
+        opacity: 0.44;
     }
 
     #number-input {
-        display: none; /* Hide the input for mobile */
+        display: none;
     }
 
     .number-button {
-        width: 30px; /* Adjust button width */
-        height: 30px; /* Adjust button height */
-        font-size: 1rem; /* Adjust font size for mobile */
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
         margin-right: 0;
         cursor: pointer;
         background-color: #000;
         color: #fff;
         border: none;
-        opacity: 0.3; /* Adjust opacity for better visibility on mobile */
+        opacity: 0.3;
         transition: opacity 0.6s ease-in-out;
     }
 
     .number-button:hover {
-        opacity: 0.9; /* Adjust hover opacity for better interaction */
+        opacity: 0.9;
     }
 }
 
