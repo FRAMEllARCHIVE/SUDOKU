@@ -22,6 +22,19 @@
             transition: opacity 1.8s ease-in-out, visibility 0s 1s;
         }
 
+button#fullscreen-button {
+    background: transparent;
+    border: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* Make the button invisible */
+    cursor: pointer;
+}
+
+
     h1:hover {
         opacity: 0.9;
     }
@@ -185,7 +198,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>SUDOKU</h1>
+        <h1>SUDOKU <button id="fullscreen-button"></button></h1>
         <div class="sudoku-board" id="sudoku-board"></div>
         <div id="message" style="text-align: center; color: red;"></div>
         <div id="number-input">
@@ -398,6 +411,22 @@ function flashRed() {
                 }
             }
         }
+
+// Add an event listener to the entire <h1> to trigger fullscreen
+const h1 = document.querySelector("h1");
+
+h1.addEventListener("click", () => {
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) {
+        document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+        document.documentElement.msRequestFullscreen();
+    }
+});
+
 
     </script>
 </body>
