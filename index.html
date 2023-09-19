@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUDOKU SOLUTIONS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 23.5px;
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            padding: 0px 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 111vh;
+        }
+
+        .sudoku-board {
+            display: grid;
+            grid-template-columns: repeat(9, minmax(40px, 1fr));
+            gap: 7px;
+            max-width: 80vw;
+        }
+
+        .sudoku-cell {
+            width: 44px;
+            height: 44px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            border: 2px solid #ccc;
+            cursor: pointer;
+            background-color: #000;
+            color: #fff;
+            position: relative;
+        }
+
+        .sudoku-cell.invalid {
+            background-color: #000;
+        }
+
+        .possibilities {
+            position: absolute;
+            top: 5px;
+            left: 7px;
+            font-size: 9px;
+            color: #fff;
+            display: grid;
+            grid-template-columns: repeat(3, 3fr);
+            gap: 3px 7px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SUDOKU SOLUTIONS</h1>
+        <div class="sudoku-board" id="sudoku-board"></div>
+        <div id="message" style="text-align: center; color: red;"></div>
+    </div>
+
+    <script>
+        const GRID_SIZE = 9;
+        const board = document.getElementById("sudoku-board");
+        const message = document.getElementById("message");
+        let selectedCell = null;
+        let invalidMove = false;
+        const sudoku = new Array(GRID_SIZE).fill(null).map(() => new Array(GRID_SIZE).fill(0));
+
+        for (let row = 0; row < GRID_SIZE; row++) {
+            for (let col = 0; col < GRID_SIZE; col++) {
+                const cell = document.createElement("div");
+                cell.classList.add("sudoku-cell");
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+                cell.addEventListener("click", () => selectCell(row, col));
+                board.appendChild(cell);
+            }
+        }
+
+function renderBoard() {
+    for (let row = 0; row < GRID_SIZE; row++) {
+        for (let col = 0; col < GRID_SIZE; col++) {
+            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            cell.textContent = sudoku[row][col] === 0 ? "" : sudoku[row][col];
+            if (sudoku[row][col] === 0) {
+                const possibilities = calculatePossibilities(row, col);
+                if (possibilities.length > 0) {
+                    const possibilitiesDiv = document.createElement("div");
+                    possibilitiesDiv.classList.add("possibilities");
+                    for (let i = 1; i <= 9; i++) {
+                        const possibilityItem = document.createElement("div");
+                        possibilityItem.textContent = possibilities.includes(i) ? i : "";
+                        possibilitiesDiv.appendChild(possibilityItem);
+                    }
+                    cell.appendChild(possibilitiesDiv);
+                }
+            }
+            if (invalidMove) {
+                cell.classList.add("invalid");
+            } else {
+                cell.classList.remove("invalid");
+            }
+        }
+    }
+}
+
+
+        function selectCell(row, col) {
+            selectedCell = { row, col };
+            renderBoard();
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (selectedCell !== null) {
+                const row = selectedCell.row;
+                const col = selectedCell.col;
+                const digit = parseInt(e.key);
+                if (!isNaN(digit) && digit >= 1 && digit <= 9) {
+                    if (isValidMove(row, col, digit)) {
+                        sudoku[row][col] = digit;
+                        invalidMove = false;
+                        selectedCell = null;
+                        renderBoard();
+                        checkWin();
+                    } else {
+                        invalidMove = true;
+                        renderBoard();
+                    }
+                }
+            }
+        });
+
+        function calculatePossibilities(row, col) {
+            const used = new Array(10).fill(false);
+
+            for (let i = 0; i < GRID_SIZE; i++) {
+                used[sudoku[row][i]] = true;
+            }
+
+            for (let i = 0; i < GRID_SIZE; i++) {
+                used[sudoku[i][col]] = true;
+            }
+
+            const startRow = Math.floor(row / 3) * 3;
+            const startCol = Math.floor(col / 3) * 3;
+            for (let i = startRow; i < startRow + 3; i++) {
+                for (let j = startCol; j < startCol + 3; j++) {
+                    used[sudoku[i][j]] = true;
+                }
+            }
+            const possibilities = [];
+            for (let i = 1; i <= 9; i++) {
+                if (!used[i]) {
+                    possibilities.push(i);
+                }
+            }
+            return possibilities;
+        }
+
+function clearInvalid() {
+    invalidMove = false;
+    renderBoard();
+}
+
+function flashRed() {
+    board.style.backgroundColor = "#ffcccc";
+    setTimeout(() => {
+        board.style.backgroundColor = "transparent";
+        clearInvalid();
+    }, 1000);
+}
+
+document.addEventListener("keydown", (e) => {
+    if (selectedCell !== null) {
+        const row = selectedCell.row;
+        const col = selectedCell.col;
+        const digit = parseInt(e.key);
+        if (!isNaN(digit) && digit >= 1 && digit <= 9) {
+            if (isValidMove(row, col, digit)) {
+                sudoku[row][col] = digit;
+                selectedCell = null;
+                renderBoard();
+                checkWin();
+            } else {
+                invalidMove = true;
+                flashRed();
+            }
+        }
+    }
+});
+
+function flashRed() {
+    document.body.style.backgroundColor = "#fff";
+
+    setTimeout(() => {
+        document.body.style.backgroundColor = "#000";
+        clearInvalid();
+    }, 1000);
+}
+
+
+        function isValidMove(row, col, digit) {
+            return (
+                !isUsedInRow(row, digit) &&
+                !isUsedInCol(col, digit) &&
+                !isUsedInGrid(row - (row % 3), col - (col % 3), digit)
+            );
+        }
+
+        function isUsedInRow(row, digit) {
+            return sudoku[row].includes(digit);
+        }
+
+        function isUsedInCol(col, digit) {
+            for (let row = 0; row < GRID_SIZE; row++) {
+                if (sudoku[row][col] === digit) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function isUsedInGrid(gridRow, gridCol, digit) {
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    if (sudoku[row + gridRow][col + gridCol] === digit) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function checkWin() {
+        }
+
+        renderBoard();
+    </script>
+</body>
+</html>
