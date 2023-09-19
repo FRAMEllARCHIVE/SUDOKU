@@ -91,6 +91,7 @@ button#fullscreen-button {
         }
 
         .number-button {
+            user-select: none;
             width: 39.8px;
             height: 39.8px;
             font-size: 1.6rem;
@@ -412,7 +413,6 @@ function flashRed() {
             }
         }
 
-// Add an event listener to the entire <h1> to trigger fullscreen
 const h1 = document.querySelector("h1");
 
 h1.addEventListener("click", () => {
@@ -426,7 +426,6 @@ h1.addEventListener("click", () => {
         document.documentElement.msRequestFullscreen();
     }
 });
-
 
     </script>
 </body>
