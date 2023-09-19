@@ -14,8 +14,9 @@
         }
 
         h1 {
+            user-select: none;
             text-align: center;
-            margin-top: 0;
+            margin-top: 0px;
             padding: 0px 0;
             opacity:0.16;
             transition: opacity 1.8s ease-in-out, visibility 0s 1s;
@@ -25,7 +26,7 @@ button#fullscreen-button {
     background: transparent;
     border: none;
     position: absolute;
-    top: 22%;
+    top: 18%;
     left: 0;
     width: 100%;
     height: 15%;
@@ -43,7 +44,8 @@ button#fullscreen-button {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 111vh;
+            min-height: 100vh;
+            padding: 0px;
         }
 
         .sudoku-board {
