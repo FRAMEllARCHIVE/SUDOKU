@@ -465,10 +465,10 @@ function timeToSolveSudoku() {
     }
 
     console.log("Initial:", grid);
-    backtrackingsolution(grid);
+    enterTheUnknown(grid);
 }
 
-function backtrackingsolution(grid) {
+function findFewest(grid) {
     let fewestMultipleEntriesArray = null;
     let fewestMultipleEntriesCount = Infinity;
 
@@ -484,10 +484,24 @@ function backtrackingsolution(grid) {
     }
 
     console.log("Array with the fewest multiple entries:", fewestMultipleEntriesArray);
-//save state make choice and enterTheUnknown(grid); 
+//return  fewestMultipleEntriesArray
 }
    
-      
+   
+function enterTheUnknown(grid) {  
+   //save state
+   //findfewest 
+   //implement array update
+   //check gridIntegrity
+   // 
+}   
+   
+   
+     
+function gridIntegrity(grid) {  
+   //check grid integrity   
+}     
+        
     </script>
 
 </body>
