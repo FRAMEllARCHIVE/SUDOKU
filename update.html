@@ -438,9 +438,11 @@ button#fullscreen-button {
         }
     }
    
-const h1 = document.querySelector("h1");
+   
+      
+   const h1 = document.querySelector("h1");
 
-h1.addEventListener("click", timeToSolveSudoku);
+   h1.addEventListener("click", timeToSolveSudoku);
 
 function timeToSolveSudoku() {
     let grid = [];
@@ -462,11 +464,30 @@ function timeToSolveSudoku() {
         grid.push(rowArray);
     }
 
-    console.log("Current Sudoku Grid with Possibilities:", grid);
-
+    console.log("Initial:", grid);
+    backtrackingsolution(grid);
 }
 
-     
+function backtrackingsolution(grid) {
+    let fewestMultipleEntriesArray = null;
+    let fewestMultipleEntriesCount = Infinity;
+
+    for (let row = 0; row < grid.length; row++) {
+        for (let col = 0; col < grid[row].length; col++) {
+            let cell = grid[row][col];
+            
+            if (cell.length > 1 && cell.length < fewestMultipleEntriesCount) {
+                fewestMultipleEntriesCount = cell.length;
+                fewestMultipleEntriesArray = cell;
+            }
+        }
+    }
+
+    console.log("Array with the fewest multiple entries:", fewestMultipleEntriesArray);
+//save state make choice and enterTheUnknown(grid); 
+}
+   
+      
     </script>
 
 </body>
