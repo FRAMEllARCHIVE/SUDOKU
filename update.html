@@ -437,20 +437,36 @@ button#fullscreen-button {
             }
         }
     }
+   
+const h1 = document.querySelector("h1");
 
-    const h1 = document.querySelector("h1");
-    h1.addEventListener("click", () => {
-        if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen();
-        } else if (document.documentElement.mozRequestFullScreen) {
-            document.documentElement.mozRequestFullScreen();
-        } else if (document.documentElement.webkitRequestFullscreen) {
-            document.documentElement.webkitRequestFullscreen();
-        } else if (document.documentElement.msRequestFullscreen) {
-            document.documentElement.msRequestFullscreen();
+h1.addEventListener("click", timeToSolveSudoku);
+
+function timeToSolveSudoku() {
+    let grid = [];
+
+    for (let row = 0; row < 9; row++) {
+        let rowArray = [];
+        for (let col = 0; col < 9; col++) {
+            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            let value = cell.textContent.trim();
+
+            if (value && value.length > 1) {
+                rowArray.push(value.split(''));
+            } else if (value && value.length === 1) {
+                rowArray.push([value]);
+            } else {
+                rowArray.push([]);
+            }
         }
-    });
-</script>
+        grid.push(rowArray);
+    }
+
+    console.log("Current Sudoku Grid with Possibilities:", grid);
+}
+
+     
+    </script>
 
 </body>
 </html>
