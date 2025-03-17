@@ -465,9 +465,72 @@ function timeToSolveSudoku() {
     }
 
     console.log("Initial:", grid);
-    enterTheUnknown(grid);
+    //SaveSafeState(grid, null);
+    enterTheUnknown(arrayofsafestate);
 }
+   
+function enterTheUnknown(safestate) {  
 
+    
+   //if options = null 
+        // findFewest(grid); 
+        // SaveSafeState(grid, options);
+    
+        //UpdateGrid(grid,options);
+           //gridIntegrity(grid);
+             //if bad
+                 // enterTheUnknown(arrayofsafestates);
+  
+            //if options <1 delete current arrayofsafestates 
+                  // enterTheUnknown(arrayofsafestates);
+    
+         //if integrity passes then            
+            // SaveSafeState(grid, null);
+            // enterTheUnknown(arrayofsafestates);
+ 
+   
+   
+   
+   
+   
+       
+   //else 
+    
+        // reduceOptions (options); 
+        // SaveSafeState(grid, options);
+        // UpdateGrid(grid,options);
+           //gridIntegrity(grid);
+             //if bad
+                 // enterTheUnkown(arrayofsafestates);
+  
+            //if options <1 delete current arrayofsafestates 
+                  // reduceOptions (options); 
+                  // enterTheUnknown(arrayofsafestates);
+    
+         //if integrity passes then            
+            // SaveSafeState(grid, null);
+            // enterTheUnknown(arrayofsafestates);
+  
+}   
+
+   
+
+function reduceOptions (options) {
+   //remove first entry of options array
+   //return options array 
+   } 
+         
+function SaveSafeState (grid, choice) {
+   //append grid and options to arrayofsafestates 
+   } 
+    
+   
+function UpdateGrid (grid, option) {
+   //use first entry of options to update grid
+   //return grid 
+   } 
+         
+   
 function findFewest(grid) {
     let fewestMultipleEntriesArray = null;
     let fewestMultipleEntriesCount = Infinity;
@@ -487,23 +550,12 @@ function findFewest(grid) {
 //return  fewestMultipleEntriesArray
 }
    
-   
-function enterTheUnknown(grid) {  
-   //append grid to arrayofsafestates
-   //findfewest append options along with grid to arrayofsafestates 
-   //select first option 
-      //implement array update
-         //check gridIntegrity
-            //if bad select another option
-            //if all options are bad revert back to previous arrayofsafestates and remove first option 
-   //append grid to array
-   //recursive with state tracking 
-}   
-   
-   
      
 function gridIntegrity(grid) {  
    //check grid integrity   
+   //if any entries in grid are null
+   return bad
+   //else return good   
 }     
         
     </script>
