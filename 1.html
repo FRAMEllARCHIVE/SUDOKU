@@ -442,7 +442,9 @@ button#fullscreen-button {
       
    const h1 = document.querySelector("h1");
 
-   h1.addEventListener("click", timeToSolveSudoku);
+let arrayofsafestates = []
+    
+h1.addEventListener("click", timeToSolveSudoku);
 
 function timeToSolveSudoku() {
     let grid = [];
@@ -513,9 +515,13 @@ function reduceOptions (options) {
    //return options array 
    } 
          
-function SaveSafeState (grid, choice) {
-   //append grid and options to arrayofsafestates 
-   } 
+function SaveSafeState(grid, options) {
+    // Save both the grid and options as a pair in arrayofsafestates
+    arrayofsafestates.push([grid, options]);
+    console.log("State Saved:", [grid, options]);
+}
+
+ 
     
    
 function UpdateGrid (grid, option) {
