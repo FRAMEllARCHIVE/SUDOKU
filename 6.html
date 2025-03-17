@@ -728,21 +728,20 @@ function isSudokuGrid(rect) {
 
 function extractSudokuNumbers(roi) {
     console.log('Extracting numbers from ROI');
-
+    
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
     canvas.width = roi.cols;
     canvas.height = roi.rows;
 
-    ctx.putImageData(new ImageData(new Uint8ClampedArray(roi.data), roi.cols, roi.rows), 0, 0);
+    const imageData = new ImageData(new Uint8ClampedArray(roi.data), roi.cols, roi.rows);
+    ctx.putImageData(imageData, 0, 0);
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     console.log('ImageData created for OCR');
-    
+
     Tesseract.recognize(
-        imageData,
+        imgData,
         'eng',
         {
             logger: (m) => console.log(m),
