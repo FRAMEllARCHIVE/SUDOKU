@@ -632,14 +632,25 @@ function gridIntegrity(grid) {
    
    
      
-   
-   
-    const svgIcon = document.querySelector('.svg-icon svg');
-    
+   const svgIcon = document.querySelector('.svg-icon svg');
+
     svgIcon.addEventListener('click', function() {
-        console.log('click');
-    });     
-    
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+
+    fileInput.click();
+
+    fileInput.addEventListener('change', function() {
+        if (fileInput.files.length > 0) {
+            console.log('File selected:', fileInput.files[0].name);
+        } else {
+            console.log('No file selected');
+        }
+    });
+});
+   
+     
     </script>
 
 </body>
