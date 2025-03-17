@@ -468,10 +468,10 @@ function timeToSolveSudoku() {
 
     console.log("Initial:", grid);
     SaveSafeState(grid, null);
-    console.log("first state:", arrayofsavedstates);
+    console.log("first state:", arrayofsafestates);
     //enterTheUnknown(arrayofsafestates);
 }
-   
+     
 function enterTheUnknown(arrayofsafestates) {  
 
    //if options = null 
@@ -515,10 +515,6 @@ function reduceOptions (options) {
    //return options array 
    } 
          
-function SaveSafeState(grid, options) {
-    arrayofsafestates.push([grid, options]);
-    console.log("State Saved:", [grid, options]);
-}
 
  
     
@@ -547,7 +543,12 @@ function findFewest(grid) {
     console.log("Array with the fewest multiple entries:", fewestMultipleEntriesArray);
 //return  fewestMultipleEntriesArray
 }
-   
+
+function SaveSafeState(grid, options) {
+    arrayofsafestates.push([grid, options]);
+    console.log("State Saved:", [grid, options]);
+}
+    
      
 function gridIntegrity(grid) {  
    //check grid integrity   
