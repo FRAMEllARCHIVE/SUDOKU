@@ -641,100 +641,94 @@ function gridIntegrity(grid) {
      
         const svgIcon = document.querySelector('.svg-icon svg');
 
-        svgIcon.addEventListener('click', function() {
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = 'image/*'; // Accept only images
+svgIcon.addEventListener('click', function() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
 
-            fileInput.click();
+    fileInput.click();
 
-            fileInput.addEventListener('change', function() {
-                if (fileInput.files.length > 0) {
-                    const img = document.getElementById('uploadedImage');
-                    img.src = URL.createObjectURL(fileInput.files[0]);
-                    img.onload = function() {
-                        processImage(img);
-                    };
-                } else {
-                    console.log('No file selected');
-                }
-            });
-        });
-
-        function processImage(img) {
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Set canvas size to image size
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            // Draw the image on the canvas
-            ctx.drawImage(img, 0, 0, img.width, img.height);
-
-            // Convert to grayscale and detect Sudoku grid
-            let src = cv.imread(canvas);
-            let gray = new cv.Mat();
-            cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-
-            // Apply threshold to find edges
-            let threshold = new cv.Mat();
-            cv.threshold(gray, threshold, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
-
-            // Find contours of the grid
-            let contours = new cv.MatVector();
-            let hierarchy = new cv.Mat();
-            cv.findContours(threshold, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-
-            // Loop through the contours to find the Sudoku grid
-            for (let i = 0; i < contours.size(); i++) {
-                let contour = contours.get(i);
-                let rect = cv.boundingRect(contour);
-
-                // Check if it's a square, roughly 9x9 grid, and extract the region of interest (ROI)
-                if (isSudokuGrid(rect)) {
-                    let roi = src.roi(rect);
-                    extractSudokuNumbers(roi);
-                    break;
-                }
-            }
-
-            // Clean up
-            src.delete();
-            gray.delete();
-            threshold.delete();
-            contours.delete();
-            hierarchy.delete();
+    fileInput.addEventListener('change', function() {
+        if (fileInput.files.length > 0) {
+            const img = document.getElementById('uploadedImage');
+            img.src = URL.createObjectURL(fileInput.files[0]);
+            img.onload = function() {
+                processImage(img);
+            };
+        } else {
+            console.log('No file selected');
         }
+    });
+});
 
-        function isSudokuGrid(rect) {
-            // Check if the aspect ratio of the rectangle is close to 1 (square)
-            return Math.abs(rect.width - rect.height) < 30;
+function processImage(img) {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+
+    let src = cv.imread(canvas);
+    let gray = new cv.Mat();
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+    let blurred = new cv.Mat();
+    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+
+    let threshold = new cv.Mat();
+    cv.threshold(blurred, threshold, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
+
+    let contours = new cv.MatVector();
+    let hierarchy = new cv.Mat();
+    cv.findContours(threshold, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+    for (let i = 0; i < contours.size(); i++) {
+        let contour = contours.get(i);
+        let rect = cv.boundingRect(contour);
+
+        if (isSudokuGrid(rect)) {
+            let roi = src.roi(rect);
+            extractSudokuNumbers(roi);
+            break;
         }
+    }
 
-        function extractSudokuNumbers(roi) {
-            // Now, we can use Tesseract.js to extract numbers from each cell in the ROI
-            Tesseract.recognize(
-                roi, // This should be the ROI containing the Sudoku grid
-                'eng', // Language to use
-                {
-                    logger: (m) => console.log(m)
-                }
-            ).then(({ data: { text } }) => {
-                console.log('OCR Result:', text);
+    src.delete();
+    gray.delete();
+    blurred.delete();
+    threshold.delete();
+    contours.delete();
+    hierarchy.delete();
+}
 
-                // You need to process the text and split it into a 9x9 Sudoku grid
-                const sudokuGrid = processOCRTextToGrid(text);
-                console.log('Sudoku Grid:', sudokuGrid);
-            });
+function isSudokuGrid(rect) {
+    return Math.abs(rect.width - rect.height) < 30 && rect.width > 100;
+}
+
+function extractSudokuNumbers(roi) {
+    Tesseract.recognize(
+        roi,
+        'eng',
+        {
+            logger: (m) => console.log(m)
         }
+    ).then(({ data: { text } }) => {
+        console.log('OCR Result:', text);
 
-        function processOCRTextToGrid(text) {
-            const rows = text.trim().split('\n');
-            const grid = rows.map(row => row.trim().split(/\s+/).map(Number));
-            return grid;
-        }
-      
+        const sudokuGrid = processOCRTextToGrid(text);
+        console.log('Sudoku Grid:', sudokuGrid);
+    }).catch((error) => {
+        console.error('OCR Error:', error);
+    });
+}
+
+function processOCRTextToGrid(text) {
+    const rows = text.trim().split('\n');
+    const grid = rows.map(row => row.trim().split(/\s+/).map(num => parseInt(num) || 0));
+    return grid;
+}
     </script>
 
 </body>
