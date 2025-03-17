@@ -729,31 +729,35 @@ function isSudokuGrid(rect) {
 function extractSudokuNumbers(roi) {
     console.log('Extracting numbers from ROI');
     
+    // Create a temporary canvas and draw the ROI onto it
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = roi.cols;
     canvas.height = roi.rows;
 
+    // Draw the image data to the canvas directly using the ROI
     const imageData = new ImageData(new Uint8ClampedArray(roi.data), roi.cols, roi.rows);
     ctx.putImageData(imageData, 0, 0);
 
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    console.log('ImageData created for OCR');
+    // Convert the canvas to a Blob and create an object URL
+    canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
 
-    Tesseract.recognize(
-        imgData,
-        'eng',
-        {
-            logger: (m) => console.log(m),
-        }
-    ).then(({ data: { text } }) => {
-        console.log('OCR Result:', text);
+        Tesseract.recognize(
+            url,
+            'eng',
+            {
+                logger: (m) => console.log(m),
+            }
+        ).then(({ data: { text } }) => {
+            console.log('OCR Result:', text);
 
-        const sudokuGrid = processOCRTextToGrid(text);
-        console.log('Sudoku Grid:', sudokuGrid);
-    }).catch((error) => {
-        console.error('OCR Error:', error);
-    });
+            const sudokuGrid = processOCRTextToGrid(text);
+            console.log('Sudoku Grid:', sudokuGrid);
+        }).catch((error) => {
+            console.error('OCR Error:', error);
+        });
+    }, 'image/png');
 }
 
 function processOCRTextToGrid(text) {
