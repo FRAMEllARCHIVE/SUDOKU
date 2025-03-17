@@ -467,13 +467,13 @@ function timeToSolveSudoku() {
     }
 
     console.log("Initial:", grid);
-    //SaveSafeState(grid, null);
-    enterTheUnknown(arrayofsafestate);
+    SaveSafeState(grid, null);
+    console.log("first state:", arrayofsavedstates);
+    //enterTheUnknown(arrayofsafestates);
 }
    
-function enterTheUnknown(safestate) {  
+function enterTheUnknown(arrayofsafestates) {  
 
-    
    //if options = null 
     
         // if findFewest(grid) = 0
@@ -516,7 +516,6 @@ function reduceOptions (options) {
    } 
          
 function SaveSafeState(grid, options) {
-    // Save both the grid and options as a pair in arrayofsafestates
     arrayofsafestates.push([grid, options]);
     console.log("State Saved:", [grid, options]);
 }
