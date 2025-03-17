@@ -473,47 +473,40 @@ function enterTheUnknown(safestate) {
 
     
    //if options = null 
-        // findFewest(grid); 
-        // SaveSafeState(grid, options);
     
-        //UpdateGrid(grid,options);
-           //gridIntegrity(grid);
-             //if bad
-                 // enterTheUnknown(arrayofsafestates);
-  
-            //if options <1 delete current arrayofsafestates 
-                  // enterTheUnknown(arrayofsafestates);
-    
-         //if integrity passes then            
-            // SaveSafeState(grid, null);
-            // enterTheUnknown(arrayofsafestates);
+        // if findFewest(grid) = 0
+            // puzzleSolved(grid)
+        //else
+            // append options
+            // enterTheInfinite(arrayofsafestates)
  
-   
-   
-   
-   
-   
-       
    //else 
+        // enterTheInfinite(arrayofsafestates); 
     
-        // reduceOptions (options); 
+}   
+
+    
+function enterTheInfinite(arrayofsafestates) {  
+    
         // SaveSafeState(grid, options);
         // UpdateGrid(grid,options);
            //gridIntegrity(grid);
              //if bad
                  // enterTheUnkown(arrayofsafestates);
   
-            //if options <1 delete current arrayofsafestates 
-                  // reduceOptions (options); 
+            //if options <1 
+                  // deleteCurrentArray();
+                  // reduceOptions(options); 
                   // enterTheUnknown(arrayofsafestates);
     
          //if integrity passes then            
             // SaveSafeState(grid, null);
             // enterTheUnknown(arrayofsafestates);
-  
-}   
+}
 
-   
+function deleteCurrentArray (arrayofsafestates) {
+   //delete current first entry
+   }    
 
 function reduceOptions (options) {
    //remove first entry of options array
@@ -554,7 +547,7 @@ function findFewest(grid) {
 function gridIntegrity(grid) {  
    //check grid integrity   
    //if any entries in grid are null
-   return bad
+        // return bad
    //else return good   
 }     
         
