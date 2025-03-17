@@ -22,19 +22,6 @@
             transition: opacity 1.8s ease-in-out, visibility 0s 1s;
         }
 
-button#fullscreen-button {
-    background: transparent;
-    border: none;
-    position: absolute;
-    top: 11%;
-    left: 0;
-    width: 100%;
-    height: 15%;
-    opacity: 0;
-    cursor: pointer;
-}
-
-
     h1:hover {
         opacity: 0.9;
     }
@@ -137,17 +124,6 @@ button#fullscreen-button {
     opacity: 0.9;
     }
 
-button#fullscreen-button {
-    background: transparent;
-    border: none;
-    position: absolute;
-    top: 14%;
-    left: 0;
-    width: 100%;
-    height: 15%;
-    opacity: 0;
-    cursor: pointer;
-}
 
     .container {
         display: flex;
@@ -216,7 +192,8 @@ button#fullscreen-button {
 </head>
 <body>
     <div class="container">
-        <h1>SUDOKU <button id="fullscreen-button"></button></h1>
+        <h1>SUDOKU</h1>
+        
         <div class="sudoku-board" id="sudoku-board"></div>
         <div id="message" style="text-align: center; color: red;"></div>
         <div id="number-input">
