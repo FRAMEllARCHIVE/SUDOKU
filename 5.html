@@ -637,9 +637,7 @@ function gridIntegrity(grid) {
 }     
         
    
-   
-     
-        const svgIcon = document.querySelector('.svg-icon svg');
+   const svgIcon = document.querySelector('.svg-icon svg');
 
 svgIcon.addEventListener('click', function() {
     const fileInput = document.createElement('input');
@@ -653,6 +651,7 @@ svgIcon.addEventListener('click', function() {
             const img = document.getElementById('uploadedImage');
             img.src = URL.createObjectURL(fileInput.files[0]);
             img.onload = function() {
+                console.log('Image loaded successfully');
                 processImage(img);
             };
         } else {
@@ -665,10 +664,23 @@ function processImage(img) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
-    canvas.width = img.width;
-    canvas.height = img.height;
+    const maxWidth = 1024;
+    const maxHeight = 1024;
+    let width = img.width;
+    let height = img.height;
 
-    ctx.drawImage(img, 0, 0, img.width, img.height);
+    if (width > maxWidth || height > maxHeight) {
+        const scale = Math.min(maxWidth / width, maxHeight / height);
+        width *= scale;
+        height *= scale;
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, width, height);
+
+    console.log('Image drawn to canvas');
 
     let src = cv.imread(canvas);
     let gray = new cv.Mat();
@@ -684,15 +696,22 @@ function processImage(img) {
     let hierarchy = new cv.Mat();
     cv.findContours(threshold, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
+    let sudokuGridFound = false;
     for (let i = 0; i < contours.size(); i++) {
         let contour = contours.get(i);
         let rect = cv.boundingRect(contour);
 
         if (isSudokuGrid(rect)) {
+            console.log('Sudoku grid found');
             let roi = src.roi(rect);
             extractSudokuNumbers(roi);
+            sudokuGridFound = true;
             break;
         }
+    }
+
+    if (!sudokuGridFound) {
+        console.log('No Sudoku grid found in the image.');
     }
 
     src.delete();
@@ -708,11 +727,12 @@ function isSudokuGrid(rect) {
 }
 
 function extractSudokuNumbers(roi) {
+    console.log('Extracting numbers from ROI');
     Tesseract.recognize(
         roi,
         'eng',
         {
-            logger: (m) => console.log(m)
+            logger: (m) => console.log(m),
         }
     ).then(({ data: { text } }) => {
         console.log('OCR Result:', text);
@@ -725,9 +745,17 @@ function extractSudokuNumbers(roi) {
 }
 
 function processOCRTextToGrid(text) {
+    console.log('Processing OCR text to grid');
     const rows = text.trim().split('\n');
     const grid = rows.map(row => row.trim().split(/\s+/).map(num => parseInt(num) || 0));
-    return grid;
+
+    if (grid.length === 9 && grid.every(row => row.length === 9)) {
+        console.log('OCR grid is valid');
+        return grid;
+    } else {
+        console.error('Invalid OCR Grid Structure');
+        return null;
+    }
 }
     </script>
 
