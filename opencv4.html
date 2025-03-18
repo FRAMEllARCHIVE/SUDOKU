@@ -271,66 +271,13 @@ function findLargestWhiteSquareInCell(cell) {
     return zoomedRect;
 }
 
-async function extractGridSquares(grid) {
-    let size = 900;
-    let cellSize = size / 9;
-    let outputSize = 64;
-    let margin = 25;
-
-    let sudokuNumbers = Array(9).fill().map(() => Array(9).fill(0));
-
-    for (let row = 0; row < 9; row++) {
-        for (let col = 0; col < 9; col++) {
-            let x = col * cellSize - margin;
-            let y = row * cellSize - margin;
-            let rect = new cv.Rect(x, y, cellSize + 2 * margin, cellSize + 2 * margin);
-
-            if (x < 0) {
-                rect.x = 0;
-            }
-            if (y < 0) {
-                rect.y = 0;
-            }
-            if (x + rect.width > grid.cols) {
-                rect.width = grid.cols - x;
-            }
-            if (y + rect.height > grid.rows) {
-                rect.height = grid.rows - y;
-            }
-
-            let square = grid.roi(rect);
-
-            let largestSquare = findLargestWhiteSquareInCell(square);
-
-            let croppedSquare = square.roi(largestSquare);
-
-            let resized = new cv.Mat();
-            cv.resize(croppedSquare, resized, new cv.Size(outputSize, outputSize));
-
-            let blob = await matToBlob(resized);
-            let recognizedNumber = await recognizeDigit(blob);
-
-            sudokuNumbers[row][col] = recognizedNumber;
-
-            showDebugImage(resized, `Cell (${row},${col}): ${recognizedNumber}`);
-
-            square.delete();
-            croppedSquare.delete();
-            resized.delete();
-        }
-    }
-
-    console.log("Extracted Sudoku Grid:", sudokuNumbers);
-   updateUIWithSolvedGrid(sudokuNumbers); 
-    return sudokuNumbers;
-}
  async function extractGridSquares(grid) {
     let size = 900;
     let cellSize = size / 9;
     let outputSize = 64;
     let margin = 25;
 
-    let sudokuNumbers = Array(9).fill().map(() => Array(9).fill([]));  // Initialize as empty arrays
+    let sudokuNumbers = Array(9).fill().map(() => Array(9).fill([]));
 
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
@@ -353,7 +300,6 @@ async function extractGridSquares(grid) {
             let blob = await matToBlob(resized);
             let recognizedNumber = await recognizeDigit(blob);
 
-            // Replace 0 with null
             sudokuNumbers[row][col] = recognizedNumber === 0 ? [null] : [recognizedNumber]; 
 
             showDebugImage(resized, `Cell (${row},${col}): ${recognizedNumber}`);
@@ -365,10 +311,6 @@ async function extractGridSquares(grid) {
     }
 
     console.log("Extracted Sudoku Grid:", sudokuNumbers);
-
-    // Call the function to update the UI with the solved grid
-    updateUIWithSolvedGrid(sudokuNumbers);
-
     return sudokuNumbers;
 }  
          
