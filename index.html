@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUDOKU</title>
+    <script src="https://cdn.jsdelivr.net/npm/opencv.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js"></script> 
+   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script> 
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,24 +19,10 @@
         h1 {
             user-select: none;
             text-align: center;
-            margin-top: 0px;
-            padding: 0px 0;
+            margin: auto;
             opacity:0.16;
             transition: opacity 1.8s ease-in-out, visibility 0s 1s;
         }
-
-button#fullscreen-button {
-    background: transparent;
-    border: none;
-    position: absolute;
-    top: 11%;
-    left: 0;
-    width: 100%;
-    height: 15%;
-    opacity: 0;
-    cursor: pointer;
-}
-
 
     h1:hover {
         opacity: 0.9;
@@ -43,17 +32,17 @@ button#fullscreen-button {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: -44px;
+            margin: auto;
+   height: 90vh; 
             justify-content: center;
-            min-height: 100vh;
-            padding: 0px;
         }
 
         .sudoku-board {
             display: grid;
             grid-template-columns: repeat(9, minmax(40px, 1fr));
             gap: 7px;
-            max-width: 80vw;
+            max-width: 90vw;
+   margin: auto;  
         }
 
         .sudoku-cell {
@@ -80,6 +69,7 @@ button#fullscreen-button {
             top: 5px;
             left: 7px;
             font-size: 9px;
+   line-height: 9px; 
             color: #fff;
             display: grid;
             grid-template-columns: repeat(3, 3fr);
@@ -125,9 +115,7 @@ button#fullscreen-button {
     h1 {
         user-select: none;
         text-align: center;
-        margin-top: 15px;
-        padding: 0;
-        font-size: 72px;
+        font-size: 3rem;
         letter-spacing: 10px;
         opacity:0.16;
         transition: opacity 1.8s ease-in-out, visibility 0s 1s;
@@ -137,37 +125,23 @@ button#fullscreen-button {
     opacity: 0.9;
     }
 
-button#fullscreen-button {
-    background: transparent;
-    border: none;
-    position: absolute;
-    top: 14%;
-    left: 0;
-    width: 100%;
-    height: 15%;
-    opacity: 0;
-    cursor: pointer;
-}
 
     .container {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 100vh;
-        padding: 10px;
     }
 
     .sudoku-board {
         display: grid;
         grid-template-columns: repeat(9, minmax(30px, 1fr));
-        gap: 5px;
-        max-width: 90vw;
+        gap: 2px; 
     }
 
     .sudoku-cell {
-        width: 30px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
         font-size: 1rem;
         border: 1px solid #ccc;
     }
@@ -179,8 +153,9 @@ button#fullscreen-button {
     .possibilities {
         position: absolute;
         top: 2px;
-        left: 5px;
-        font-size: 6.9px;
+        left: 3px;
+        font-size: 6px;
+   line-height: 6px; 
         letter-spacing: 3px;
         color: #fff;
         display: grid;
@@ -212,11 +187,32 @@ button#fullscreen-button {
     }
 }
 
+.svg-icon {
+    display: inline-block;
+}
+
+.svg-icon svg {
+    width: 3rem;
+    height: 3rem;
+    fill: white;
+   opacity: 0.2; 
+    transition: opacity 1s ease;
+   margin-bottom: 1rem; 
+}
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>SUDOKU <button id="fullscreen-button"></button></h1>
+        <h1>SUDOKU</h1>
+        
+    <div class="svg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path d="M149.1 64.8L138.7 96 64 96C28.7 96 0 124.7 0 160L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64l-74.7 0L362.9 64.8C356.4 45.2 338.1 32 317.4 32L194.6 32c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"/>
+        </svg>
+    </div>
+
+ 
         <div class="sudoku-board" id="sudoku-board"></div>
         <div id="message" style="text-align: center; color: red;"></div>
         <div id="number-input">
@@ -232,6 +228,11 @@ button#fullscreen-button {
         </div>
     </div>
 
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="uploadedImage" style="display:none;" />
+
+  
+     
 <script>
     const GRID_SIZE = 9;
     const board = document.getElementById("sudoku-board");
@@ -437,19 +438,550 @@ button#fullscreen-button {
             }
         }
     }
+   
+   
+      
+const h1 = document.querySelector("h1");
 
-    const h1 = document.querySelector("h1");
-    h1.addEventListener("click", () => {
-        if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen();
-        } else if (document.documentElement.mozRequestFullScreen) {
-            document.documentElement.mozRequestFullScreen();
-        } else if (document.documentElement.webkitRequestFullscreen) {
-            document.documentElement.webkitRequestFullscreen();
-        } else if (document.documentElement.msRequestFullscreen) {
-            document.documentElement.msRequestFullscreen();
+let arrayofsafestates = []
+    
+h1.addEventListener("click", timeToSolveSudoku);
+
+function timeToSolveSudoku() {
+    let grid = [];
+
+    for (let row = 0; row < 9; row++) {
+        let rowArray = [];
+        for (let col = 0; col < 9; col++) {
+            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            let value = cell.textContent.trim();
+
+            if (value && value.length > 1) {
+                rowArray.push(value.split(''));
+            } else if (value && value.length === 1) {
+                rowArray.push([value]);
+            } else {
+                rowArray.push([]);
+            }
+        }
+        grid.push(rowArray);
+    }
+
+    console.log("Initial:", grid);
+    SimpleSudokuSolver (grid); 
+    SaveSafeState(grid, null);
+    //enterTheUnknown(arrayofsafestates);
+       updateUIWithSolvedGrid(grid);
+
+    }
+
+function updateUIWithGrid(grid) {
+
+    let invalidMoveDetected = false;
+
+    for (let row = 0; row < GRID_SIZE; row++) {
+        for (let col = 0; col < GRID_SIZE; col++) {
+            const digit = grid[row][col];
+            
+
+            if (digit >= 1 && digit <= 9) {
+                if (isValidMove(row, col, digit)) {
+                    sudoku[row][col] = digit;
+                } else {
+                    invalidMoveDetected = true;
+                    console.warn(`❌ Invalid move: ${digit} at (${row}, ${col})`);
+                }
+            }
+        }
+    }
+
+
+    renderBoard();
+    saveState();
+
+    if (invalidMoveDetected) {
+        flashRed();
+    } else {
+    }
+}   
+
+
+function updateUIWithSolvedGrid(grid) {
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            if (grid[row][col].length === 1) {
+                cell.textContent = grid[row][col][0];
+            } else {
+
+                cell.textContent = "";
+            }
+        }
+    }
+}
+
+  
+function getUsedValues(grid, row, col) {
+    const used = new Set();
+
+    for (let c = 0; c < 9; c++) {
+        if (grid[row][c].length === 1) {
+            used.add(grid[row][c][0]);
+        }
+    }
+
+    for (let r = 0; r < 9; r++) {
+        if (grid[r][col].length === 1) {
+            used.add(grid[r][col][0]);
+        }
+    }
+
+    const startRow = Math.floor(row / 3) * 3;
+    const startCol = Math.floor(col / 3) * 3;
+    for (let r = startRow; r < startRow + 3; r++) {
+        for (let c = startCol; c < startCol + 3; c++) {
+            if (grid[r][c].length === 1) {
+                used.add(grid[r][c][0]);
+            }
+        }
+    }
+
+    return used;
+}
+
+function SimpleSudokuSolver(grid) {
+    let madeChanges = false;
+
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            if (grid[row][col].length > 1) {
+                const usedValues = getUsedValues(grid, row, col);
+                const possibleValues = grid[row][col];
+
+                const updatedValues = possibleValues.filter(value => !usedValues.has(value));
+
+                if (updatedValues.length < possibleValues.length) {
+                    grid[row][col] = updatedValues;
+                    madeChanges = true;
+                }
+            }
+        }
+    }
+
+    if (madeChanges) {
+        SimpleSudokuSolver(grid);
+    } else {
+        console.log("Solved or cannot be simplified further:", grid);
+    }
+}
+       
+function SaveSafeState(grid, options) {
+    arrayofsafestates.push([grid, options]);
+        console.log("State Saved:", [grid, options]);
+}
+
+     
+function enterTheUnknown(arrayofsafestates) {  
+
+   //if options = null 
+    
+        // if findFewest(grid) = 0
+            // console.log(grid)
+        //else
+            // append options
+            // enterTheInfinite(arrayofsafestates)
+ 
+   //else 
+        // enterTheInfinite(arrayofsafestates); 
+    
+}   
+
+    
+function enterTheInfinite(arrayofsafestates) {  
+    
+        // SaveSafeState(grid, options);
+        // UpdateGrid(grid,options);
+           //gridIntegrity(grid);
+             //if bad
+                 // enterTheUnkown(arrayofsafestates);
+  
+            //if options <1 
+                  // deleteCurrentArray();
+                  // reduceOptions(options); 
+                  // enterTheUnknown(arrayofsafestates);
+    
+         //if integrity passes then            
+            // SaveSafeState(grid, null);
+            // enterTheUnknown(arrayofsafestates);
+}
+
+function deleteCurrentArray (arrayofsafestates) {
+   //delete current first entry
+   }    
+
+function reduceOptions (options) {
+   //remove first entry of options array
+   //return options array 
+   } 
+         
+
+ 
+    
+   
+function UpdateGrid (grid, option) {
+   //use first entry of options to update grid
+   //return grid 
+   } 
+         
+   
+function findFewest(grid) {
+    let fewestMultipleEntriesArray = null;
+    let fewestMultipleEntriesCount = Infinity;
+
+    for (let row = 0; row < grid.length; row++) {
+        for (let col = 0; col < grid[row].length; col++) {
+            let cell = grid[row][col];
+            
+            if (cell.length > 1 && cell.length < fewestMultipleEntriesCount) {
+                fewestMultipleEntriesCount = cell.length;
+                fewestMultipleEntriesArray = cell;
+            }
+        }
+    }
+
+    console.log("Array with the fewest multiple entries:", fewestMultipleEntriesArray);
+//return  fewestMultipleEntriesArray
+}
+   
+     
+function gridIntegrity(grid) {  
+   //check grid integrity   
+   //if any entries in grid are null
+        // return bad
+   //else return good   
+}     
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const svgIcon = document.querySelector('.svg-icon svg');
+
+svgIcon.addEventListener('click', function () {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.click();
+
+    fileInput.addEventListener('change', function () {
+        if (fileInput.files.length > 0) {
+            const img = document.getElementById('uploadedImage');
+            img.src = URL.createObjectURL(fileInput.files[0]);
+            img.onload = function () {
+                console.log('Image loaded successfully');
+                processImage(img);
+            };
+        } else {
+            console.log('No file selected');
         }
     });
+});
+
+function processImage(img) {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const maxWidth = 1024;
+    const maxHeight = 1024;
+    let width = img.width;
+    let height = img.height;
+
+    if (width > maxWidth || height > maxHeight) {
+        const scale = Math.min(maxWidth / width, maxHeight / height);
+        width *= scale;
+        height *= scale;
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+    ctx.drawImage(img, 0, 0, width, height);
+
+
+    let src = cv.imread(canvas);
+
+    let gray = new cv.Mat();
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    let blurred = new cv.Mat();
+    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+
+    let threshold = new cv.Mat();
+    cv.adaptiveThreshold(
+        blurred,
+        threshold,
+        255,
+        cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv.THRESH_BINARY_INV,
+        11,
+        2
+    );
+
+    let contours = new cv.MatVector();
+    let hierarchy = new cv.Mat();
+    cv.findContours(threshold, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+    let largestContour = findLargestSquare(contours);
+    if (!largestContour) {
+        console.error("No valid Sudoku grid found.");
+        return;
+    }
+
+    let approx = new cv.Mat();
+    cv.approxPolyDP(largestContour, approx, 0.02 * cv.arcLength(largestContour, true), true);
+
+    if (approx.rows !== 4) {
+        console.error("Sudoku grid was not detected properly.");
+        return;
+    }
+
+    let sortedPoints = sortCornerPoints(approx);
+    let warped = warpPerspective(src, sortedPoints);
+
+    extractGridSquares(warped);
+
+    src.delete();
+    gray.delete();
+    blurred.delete();
+    threshold.delete();
+    contours.delete();
+    hierarchy.delete();
+    largestContour.delete();
+    approx.delete();
+}
+
+function findLargestSquare(contours) {
+    let maxArea = 0;
+    let largestContour = null;
+
+    for (let i = 0; i < contours.size(); i++) {
+        let contour = contours.get(i);
+        let area = cv.contourArea(contour);
+        let peri = cv.arcLength(contour, true);
+        let approx = new cv.Mat();
+        cv.approxPolyDP(contour, approx, 0.02 * peri, true);
+
+        if (area > maxArea && approx.rows === 4) {
+            maxArea = area;
+            largestContour = contour.clone();
+        }
+        approx.delete();
+    }
+
+    return largestContour;
+}
+
+function sortCornerPoints(approx) {
+    let points = [];
+    for (let i = 0; i < 4; i++) {
+        points.push({ x: approx.data32S[i * 2], y: approx.data32S[i * 2 + 1] });
+    }
+
+    points.sort((a, b) => a.x + a.y - (b.x + b.y));
+
+    let topLeft = points[0];
+    let bottomRight = points[3];
+    let topRight = points[1].x > points[2].x ? points[1] : points[2];
+    let bottomLeft = points[1].x < points[2].x ? points[1] : points[2];
+
+    return [topLeft, topRight, bottomRight, bottomLeft];
+}
+
+function warpPerspective(src, points) {
+    let size = 900;
+    let dstMat = cv.matFromArray(4, 1, cv.CV_32FC2, [
+        0, 0, size, 0, size, size, 0, size
+    ]);
+
+    let srcMat = cv.matFromArray(4, 1, cv.CV_32FC2, [
+        points[0].x, points[0].y,
+        points[1].x, points[1].y,
+        points[2].x, points[2].y,
+        points[3].x, points[3].y
+    ]);
+
+    let M = cv.getPerspectiveTransform(srcMat, dstMat);
+    let dst = new cv.Mat();
+    cv.warpPerspective(src, dst, M, new cv.Size(size, size));
+
+    srcMat.delete();
+    dstMat.delete();
+    M.delete();
+
+    return dst;
+}
+
+function findLargestWhiteSquareInCell(cell) {
+    let gray = new cv.Mat();
+    cv.cvtColor(cell, gray, cv.COLOR_RGBA2GRAY);
+
+    let threshold = new cv.Mat();
+    cv.adaptiveThreshold(
+        gray,
+        threshold,
+        222,
+        cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv.THRESH_BINARY,
+        15,
+        5
+    );
+
+    let contours = new cv.MatVector();
+    let hierarchy = new cv.Mat();
+    cv.findContours(threshold, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+    let largestContour = null;
+    let maxArea = 0;
+
+    for (let i = 0; i < contours.size(); i++) {
+        let contour = contours.get(i);
+        let area = cv.contourArea(contour);
+        if (area > maxArea) {
+            let approx = new cv.Mat();
+            let peri = cv.arcLength(contour, true);
+            cv.approxPolyDP(contour, approx, 0.02 * peri, true);
+
+            if (approx.rows === 4) {
+                maxArea = area;
+                largestContour = contour.clone();
+            }
+
+            approx.delete();
+        }
+    }
+
+    if (!largestContour) {
+        return new cv.Rect(0, 0, cell.cols, cell.rows);
+    }
+
+    let rect = cv.boundingRect(largestContour);
+
+    let zoomedRect = new cv.Rect(
+        Math.max(0, rect.x + 5),
+        Math.max(0, rect.y + 5),
+        Math.max(0, rect.width - 10),
+        Math.max(0, rect.height - 10)
+    );
+
+    contours.delete();
+    hierarchy.delete();
+    gray.delete();
+    threshold.delete();
+
+    return zoomedRect;
+}
+
+   
+   async function extractGridSquares(grid) {
+    let size = 900;
+    let cellSize = size / 9;
+    let outputSize = 64;
+    let margin = 25;
+
+    let sudokuNumbers = Array(9).fill().map(() => Array(9).fill([]));
+
+    const promises = [];
+
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            let x = col * cellSize - margin;
+            let y = row * cellSize - margin;
+            let rect = new cv.Rect(x, y, cellSize + 2 * margin, cellSize + 2 * margin);
+
+            if (x < 0) rect.x = 0;
+            if (y < 0) rect.y = 0;
+            if (x + rect.width > grid.cols) rect.width = grid.cols - x;
+            if (y + rect.height > grid.rows) rect.height = grid.rows - y;
+
+            let square = grid.roi(rect);
+            let largestSquare = findLargestWhiteSquareInCell(square);
+            let croppedSquare = square.roi(largestSquare);
+
+            let resized = new cv.Mat();
+            cv.resize(croppedSquare, resized, new cv.Size(outputSize, outputSize));
+
+            let brightened = new cv.Mat();
+            cv.convertScaleAbs(resized, brightened, 1, 50);
+
+            let contrasted = new cv.Mat();
+            cv.convertScaleAbs(brightened, contrasted, 1.5, 0);
+
+            promises.push(
+                matToBlob(contrasted).then(async (blob) => {
+                    let recognizedNumber = await recognizeDigit(blob);
+
+                    sudokuNumbers[row][col] = recognizedNumber === 0 ? [null] : [recognizedNumber];
+
+                    square.delete();
+                    croppedSquare.delete();
+                    resized.delete();
+                    brightened.delete();
+                    contrasted.delete();
+                })
+            );
+        }
+    }
+
+    await Promise.all(promises);
+
+    updateUIWithGrid(sudokuNumbers);
+    return sudokuNumbers;
+}
+                       
+function matToBlob(mat) {
+    return new Promise((resolve) => {
+        let canvas = document.createElement('canvas');
+        canvas.width = mat.cols;
+        canvas.height = mat.rows;
+        let ctx = canvas.getContext('2d');
+
+        let imgData = new ImageData(new Uint8ClampedArray(mat.data), mat.cols, mat.rows);
+        ctx.putImageData(imgData, 0, 0);
+
+        canvas.toBlob((blob) => resolve(blob), 'image/png');
+    });
+}
+  
+        
+                
+async function recognizeDigit(blob) {
+    const { data: { text } } = await Tesseract.recognize(
+        blob,
+        'eng',
+        {
+            tessedit_char_whitelist: '123456789',
+            classify_bln_numeric_mode: 1
+        }
+    );
+
+    let digit = text.trim();
+    return digit.length === 1 && !isNaN(digit) ? parseInt(digit, 10) : 0;
+}
+
+   
+   
+            
 </script>
 
 </body>
