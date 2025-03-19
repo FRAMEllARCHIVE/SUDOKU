@@ -6,6 +6,7 @@
     <title>SUDOKU</title>
     <script src="https://cdn.jsdelivr.net/npm/opencv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js"></script> 
+   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script> 
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,16 +33,16 @@
             flex-direction: column;
             align-items: center;
             margin: auto;
+   height: 90vh; 
             justify-content: center;
-            min-height: 100vh;
-            padding: 0px;
         }
 
         .sudoku-board {
             display: grid;
             grid-template-columns: repeat(9, minmax(40px, 1fr));
             gap: 7px;
-            max-width: 80vw;
+            max-width: 90vw;
+   margin: auto;  
         }
 
         .sudoku-cell {
@@ -196,7 +197,7 @@
     fill: white;
    opacity: 0.2; 
     transition: opacity 1s ease;
-   margin-bottom: 2rem; 
+   margin-bottom: 1rem; 
 }
 
     </style>
@@ -469,14 +470,12 @@ function timeToSolveSudoku() {
     console.log("Initial:", grid);
     SimpleSudokuSolver (grid); 
     SaveSafeState(grid, null);
-    console.log("first state:", arrayofsafestates); 
     //enterTheUnknown(arrayofsafestates);
        updateUIWithSolvedGrid(grid);
 
     }
 
 function updateUIWithGrid(grid) {
-    console.log("updateUIWithGrid called with grid:", grid);
 
     let invalidMoveDetected = false;
 
@@ -484,12 +483,10 @@ function updateUIWithGrid(grid) {
         for (let col = 0; col < GRID_SIZE; col++) {
             const digit = grid[row][col];
             
-            console.log(`Processing cell (${row}, ${col}) with value:`, digit);
 
             if (digit >= 1 && digit <= 9) {
                 if (isValidMove(row, col, digit)) {
                     sudoku[row][col] = digit;
-                    console.log(`✅ Placed ${digit} at (${row}, ${col})`);
                 } else {
                     invalidMoveDetected = true;
                     console.warn(`❌ Invalid move: ${digit} at (${row}, ${col})`);
@@ -498,16 +495,13 @@ function updateUIWithGrid(grid) {
         }
     }
 
-    console.log("Final Sudoku Grid after update:", sudoku);
 
     renderBoard();
     saveState();
 
     if (invalidMoveDetected) {
-        console.error("⚠️ Invalid moves detected! Flashing red...");
         flashRed();
     } else {
-        console.log("🎉 UI updated successfully!");
     }
 }   
 
