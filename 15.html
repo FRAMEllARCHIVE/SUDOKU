@@ -476,7 +476,7 @@ function timeToSolveSudoku() {
     }
 
 function updateUIWithGrid(grid) {
-    console.log("updateUIWithGrid called with grid:", grid); // Log the input grid
+    console.log("updateUIWithGrid called with grid:", grid);
 
     let invalidMoveDetected = false;
 
@@ -498,7 +498,7 @@ function updateUIWithGrid(grid) {
         }
     }
 
-    console.log("Final Sudoku Grid after update:", sudoku); // Log the updated grid
+    console.log("Final Sudoku Grid after update:", sudoku);
 
     renderBoard();
     saveState();
