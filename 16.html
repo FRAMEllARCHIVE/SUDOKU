@@ -892,13 +892,16 @@ function findLargestWhiteSquareInCell(cell) {
     return zoomedRect;
 }
 
- async function extractGridSquares(grid) {
+   
+   async function extractGridSquares(grid) {
     let size = 900;
     let cellSize = size / 9;
     let outputSize = 64;
     let margin = 25;
 
     let sudokuNumbers = Array(9).fill().map(() => Array(9).fill([]));
+
+    const promises = [];
 
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
@@ -917,30 +920,35 @@ function findLargestWhiteSquareInCell(cell) {
 
             let resized = new cv.Mat();
             cv.resize(croppedSquare, resized, new cv.Size(outputSize, outputSize));
-        
-       let brightened = new cv.Mat();
-       cv.convertScaleAbs(resized, brightened, 1, 50);
 
-       let contrasted = new cv.Mat();
-       cv.convertScaleAbs(brightened, contrasted, 1.5, 0);
+            let brightened = new cv.Mat();
+            cv.convertScaleAbs(resized, brightened, 1, 50);
 
-        
-      let blob = await matToBlob(contrasted);
-        
-            let recognizedNumber = await recognizeDigit(blob);
+            let contrasted = new cv.Mat();
+            cv.convertScaleAbs(brightened, contrasted, 1.5, 0);
 
-            sudokuNumbers[row][col] = recognizedNumber === 0 ? [null] : [recognizedNumber]; 
+            promises.push(
+                matToBlob(contrasted).then(async (blob) => {
+                    let recognizedNumber = await recognizeDigit(blob);
 
-            square.delete();
-            croppedSquare.delete();
-            resized.delete();
+                    sudokuNumbers[row][col] = recognizedNumber === 0 ? [null] : [recognizedNumber];
+
+                    square.delete();
+                    croppedSquare.delete();
+                    resized.delete();
+                    brightened.delete();
+                    contrasted.delete();
+                })
+            );
         }
     }
 
-     updateUIWithGrid(sudokuNumbers);
+    await Promise.all(promises);
+
+    updateUIWithGrid(sudokuNumbers);
     return sudokuNumbers;
-}  
-                 
+}
+                       
 function matToBlob(mat) {
     return new Promise((resolve) => {
         let canvas = document.createElement('canvas');
@@ -954,7 +962,9 @@ function matToBlob(mat) {
         canvas.toBlob((blob) => resolve(blob), 'image/png');
     });
 }
-
+  
+        
+                
 async function recognizeDigit(blob) {
     const { data: { text } } = await Tesseract.recognize(
         blob,
