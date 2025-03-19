@@ -475,8 +475,8 @@ function timeToSolveSudoku() {
     SimpleSudokuSolver (grid); 
     SaveSafeState(grid, null);
     //enterTheUnknown(arrayofsafestates);
-       updateUIWithSolvedGrid(grid);
 
+    updateUIWithGrid(grid);
     }
 
 function updateUIWithGrid(grid) {
@@ -508,21 +508,6 @@ function updateUIWithGrid(grid) {
     } else {
     }
 }   
-
-
-function updateUIWithSolvedGrid(grid) {
-    for (let row = 0; row < 9; row++) {
-        for (let col = 0; col < 9; col++) {
-            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-            if (grid[row][col].length === 1) {
-                cell.textContent = grid[row][col][0];
-            } else {
-
-                cell.textContent = "";
-            }
-        }
-    }
-}
 
   
 function getUsedValues(grid, row, col) {
