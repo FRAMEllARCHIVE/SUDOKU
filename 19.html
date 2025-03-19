@@ -494,12 +494,13 @@ function timeToSolveSudoku() {
      
 function enterTheUnknown(arrayofsafestates) {  
 
-   //if options = null 
+   //if arrayofsafestates = [grid, null, null]  
     
-        // if findFewest(grid) = 0
-            // console.log(grid)
+        // if findFewest(grid) = null
+             //updateUIWithGrid(grid);
+             // console.log(grid)
         //else
-            // append options
+            // SaveSafeState(grid, coordinates, fewestMultipleEntriesArray);
             // enterTheInfinite(arrayofsafestates)
  
    //else 
@@ -509,29 +510,34 @@ function enterTheUnknown(arrayofsafestates) {
 
 function enterTheInfinite(arrayofsafestates) {  
     
-        // SaveSafeState(grid, options);
-        // UpdateGrid(grid,options);
+        // SaveSafeState(grid, coordinates, fewestMultipleEntriesArray);
+        // UpdateGrid(grid, coordinates, fewestMultipleEntriesArray);
            //gridIntegrity(grid);
              //if bad
                  // enterTheUnkown(arrayofsafestates);
   
             //if options <1 
                   // deleteCurrentArray();
-                  // reduceOptions(options); 
+                  // reduceOptions(fewestMultipleEntriesArray); 
                   // enterTheUnknown(arrayofsafestates);
     
          //if integrity passes then            
-            // SaveSafeState(grid, null);
+            // SaveSafeState(grid, null, null);
             // enterTheUnknown(arrayofsafestates);
 }
 
+function SaveSafeState(grid, options) {
+    arrayofsafestates.push([grid, coordinates, fewestMultipleEntriesArray]);
+        console.log("State Saved:", [grid, grid, coordinates, fewestMultipleEntriesArray]);
+}
+    
 function deleteCurrentArray (arrayofsafestates) {
    //delete current first entry
    }    
 
 function reduceOptions (options) {
-   //remove first entry of options array
-   //return options array 
+   //remove first entry of fewestMultipleEntriesArray array
+   //return fewestMultipleEntriesArray array 
    } 
      
 function gridIntegrity(grid) {  
@@ -542,7 +548,7 @@ function gridIntegrity(grid) {
 }     
    
 function UpdateGrid (grid, option) {
-   //use first entry of options to update grid
+   //use first entry of fewestMultipleEntriesArray to update grid
    //return grid 
    } 
          
@@ -652,14 +658,6 @@ function SimpleSudokuSolver(grid) {
         console.log("Solved or cannot be simplified further:", grid);
     }
 }
-       
-function SaveSafeState(grid, options) {
-    arrayofsafestates.push([grid, options]);
-        console.log("State Saved:", [grid, options]);
-}
-
-
-
 
 
 
