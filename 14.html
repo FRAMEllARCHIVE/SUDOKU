@@ -479,7 +479,32 @@ function timeToSolveSudoku() {
        updateUIWithSolvedGrid(grid);
 
     }
- 
+
+function updateUIWithGrid(grid) {
+    let invalidMoveDetected = false;
+
+    for (let row = 0; row < GRID_SIZE; row++) {
+        for (let col = 0; col < GRID_SIZE; col++) {
+            const digit = grid[row][col];
+
+            if (digit >= 1 && digit <= 9) {
+                if (isValidMove(row, col, digit)) {
+                    sudoku[row][col] = digit;
+                } else {
+                    invalidMoveDetected = true;
+                }
+            }
+        }
+    }
+
+    renderBoard();
+    saveState();
+
+    if (invalidMoveDetected) {
+        flashRed();
+    }
+}
+    
 
 
 function updateUIWithSolvedGrid(grid) {
@@ -923,6 +948,7 @@ function findLargestWhiteSquareInCell(cell) {
     }
 
     console.log("Extracted Sudoku Grid:", sudokuNumbers);
+     updateUIWithGrid(sudukoNumbers);
     return sudokuNumbers;
 }  
                  
