@@ -727,7 +727,40 @@ function reduceOptions(arrayofsafestates) {
 //    return grid;
 //}
   
-function UpdateGrid(arrayofsafestates) {
+//function UpdateGrid(arrayofsafestates) {
+//    if (!arrayofsafestates || arrayofsafestates.length === 0) {
+//        console.warn("UpdateGrid called with an empty or undefined arrayofsafestates.");
+//        return;
+//    }
+
+//    let latestState = arrayofsafestates[arrayofsafestates.length - 1];
+
+//    if (!latestState || latestState.length < 3) {
+//        console.warn("Latest state is invalid:", latestState);
+//        return;
+//    }
+
+//    let [grid, coordinates, fewestMultipleEntriesArray] = latestState;
+
+//    if (!grid || !coordinates || !fewestMultipleEntriesArray || fewestMultipleEntriesArray.length === 0) {
+//        console.warn("UpdateGrid called with invalid data:", { grid, coordinates, fewestMultipleEntriesArray });
+//        return;
+//    }
+
+//    let gridCopy = grid.map(row => row.slice());
+
+//    console.log("Updating grid at coordinates:", coordinates);
+//    console.log("Possible values:", fewestMultipleEntriesArray);
+    
+ //   let chosenValue = fewestMultipleEntriesArray[0];
+//    gridCopy[coordinates.row][coordinates.col] = [chosenValue];
+
+//    console.log(`Grid updated at (${coordinates.row}, ${coordinates.col}) with value: ${chosenValue}`);
+
+//    return gridCopy;
+//}
+       
+   function UpdateGrid(arrayofsafestates) {
     if (!arrayofsafestates || arrayofsafestates.length === 0) {
         console.warn("UpdateGrid called with an empty or undefined arrayofsafestates.");
         return;
@@ -757,10 +790,35 @@ function UpdateGrid(arrayofsafestates) {
 
     console.log(`Grid updated at (${coordinates.row}, ${coordinates.col}) with value: ${chosenValue}`);
 
+    gridCopy[coordinates.row] = gridCopy[coordinates.row].map((cell, colIndex) =>
+        colIndex === coordinates.col ? cell : cell.filter(val => val !== chosenValue)
+    );
+
+    for (let row = 0; row < 9; row++) {
+        if (row !== coordinates.row) {
+            gridCopy[row][coordinates.col] = gridCopy[row][coordinates.col].filter(val => val !== chosenValue);
+        }
+    }
+
+    const startRow = Math.floor(coordinates.row / 3) * 3;
+    const startCol = Math.floor(coordinates.col / 3) * 3;
+
+    for (let i = startRow; i < startRow + 3; i++) {
+        for (let j = startCol; j < startCol + 3; j++) {
+            if (i !== coordinates.row || j !== coordinates.col) {
+                gridCopy[i][j] = gridCopy[i][j].filter(val => val !== chosenValue);
+            }
+        }
+    }
+
+    console.log("Grid after removal:");
+    console.table(gridCopy);
+
     return gridCopy;
-}
-       
-         
+}      
+   
+   
+      
 function findFewest(grid) {
     let fewestMultipleEntriesArray = null;
     let fewestMultipleEntriesCount = Infinity;
