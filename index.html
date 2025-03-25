@@ -297,7 +297,6 @@
                     sudoku[row][col] = digit;
                     selectedCell = null;
                     renderBoard();
-                    checkWin();
                     saveState();
                 } else {
                     invalidMove = true;
@@ -350,7 +349,6 @@
                     sudoku[row][col] = digit;
                     selectedCell = null;
                     renderBoard();
-                    checkWin();
                     saveState();
                 } else {
                     invalidMove = true;
@@ -491,6 +489,9 @@ function enterTheUnknown(arrayofsafestates) {
             console.log("Fin:", grid);
         } else {
             SaveSafeState(grid, result.coordinates, result.fewestMultipleEntriesArray);
+   
+            SaveSafeState(grid, result.coordinates, result.fewestMultipleEntriesArray); 
+
             enterTheInfinite(arrayofsafestates);
         }
     } else {
@@ -498,6 +499,9 @@ function enterTheUnknown(arrayofsafestates) {
 }
 
 function enterTheInfinite(arrayofsafestates) {
+    
+console.log("check:", JSON.parse(JSON.stringify(arrayofsafestates))); 
+    
     let latestState = arrayofsafestates[arrayofsafestates.length - 1];        
     let [grid2, coordinates2, fewestMultipleEntriesArray2] = latestState;  
 
@@ -511,6 +515,7 @@ function enterTheInfinite(arrayofsafestates) {
     let currentgridin = UpdateGrid(arrayofsafestates); 
     let currentgridin2 = SimpleSudokuSolver(currentgridin); 
     let integrity = gridIntegrity(currentgridin2);
+    
     if (integrity === "bad") {
 
         deleteCurrentArray(arrayofsafestates);
@@ -518,10 +523,11 @@ function enterTheInfinite(arrayofsafestates) {
  
 
         if (fewestMultipleEntriesArray2.length === 0) {
+   
             deleteCurrentArray(arrayofsafestates);
             reduceOptions(arrayofsafestates);
             enterTheInfinite(arrayofsafestates);
-        } else {
+        } else { 
             enterTheInfinite(arrayofsafestates);
         }
     } else {
@@ -555,12 +561,16 @@ function gridIntegrity(grid) {
     return "good";
 }
     
-function SaveSafeState(grid, coordinates, fewestMultipleEntriesArray) {
-    const gridCopy = grid.map(row => row.slice());
+//function SaveSafeState(grid, coordinates, fewestMultipleEntriesArray) {
+//    const gridCopy = grid.map(row => row.slice());
+//    arrayofsafestates.push([gridCopy, coordinates, fewestMultipleEntriesArray]);
+//}
+   
+   function SaveSafeState(grid, coordinates, fewestMultipleEntriesArray) {
+    const gridCopy = JSON.parse(JSON.stringify(grid));
     arrayofsafestates.push([gridCopy, coordinates, fewestMultipleEntriesArray]);
-
-
 }
+      
        
 function deleteCurrentArray(arrayofsafestates) {
     if (!arrayofsafestates || arrayofsafestates.length === 0) {
@@ -589,8 +599,8 @@ function reduceOptions(arrayofsafestates) {
     fewestMultipleEntriesArray.shift();
     return fewestMultipleEntriesArray;
 }
-
-   function UpdateGrid(arrayofsafestates) {
+    
+function UpdateGrid(arrayofsafestates) {
     if (!arrayofsafestates || arrayofsafestates.length === 0) {
         return;
     }
@@ -607,11 +617,10 @@ function reduceOptions(arrayofsafestates) {
         return;
     }
 
-    let gridCopy = grid.map(row => row.slice());
+    let gridCopy = JSON.parse(JSON.stringify(grid));
 
     let chosenValue = fewestMultipleEntriesArray[0];
     gridCopy[coordinates.row][coordinates.col] = [chosenValue];
-
 
     gridCopy[coordinates.row] = gridCopy[coordinates.row].map((cell, colIndex) =>
         colIndex === coordinates.col ? cell : cell.filter(val => val !== chosenValue)
@@ -634,9 +643,9 @@ function reduceOptions(arrayofsafestates) {
         }
     }
     return gridCopy;
-}      
-
-function findFewest(grid) {
+}
+   
+     function findFewest(grid) {
     let fewestMultipleEntriesArray = null;
     let fewestMultipleEntriesCount = Infinity;
     let coordinates = null;
@@ -741,6 +750,9 @@ function SimpleSudokuSolver(grid) {
     return gridCopy;
 }
 
+   
+   
+      
    //OPENCV AND TESSERACT LOGIC
 
 const svgIcon = document.querySelector('.svg-icon svg');
